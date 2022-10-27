@@ -1,0 +1,29 @@
+<launch>
+  <arg name = "camera_name"             default="zed2i"/>
+  <arg name = "svo_file"                default=""/>
+  <arg name = "bag_file"                default="flase"/>
+  <arg name = "bag_path"                default=""/>
+  <arg name="record_path"               default="true" />
+<!-- <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 1 map odom 100" /> -->
+<node pkg="rosbag" type="record" name="rosbag_odometry_loc"
+       args="record -O $(env HOME)/.bags/localization /mavros/global_position/local /zed2i/zed_node/odom /odometry/filtered /tf /tf_static"
+       if="$(arg record_path)" />
+  <include file="$(find robot_localization)/launch/zed_camera.launch" >
+    <arg name="camera_name"            value="$(arg camera_name)"/>
+    <arg name="svo_file"                value="$(arg svo_file)"/>
+  </include>
+  <group if="$(eval arg('bag_file') =='true')">
+    <node pkg="rosbag" type="play" name="rosbag_play" args="$(arg bag_path)" />
+  </group>
+  <node pkg="autopilot_localization" type="qut_yaw.py" name="zed_pose_yaw"  />
+  <!-- <include file="$(find vehicle_common)/launch/vehicle_description.launch"/> -->
+  <node pkg="robot_localization" type="ukf_localization_node" name="ukf_localization_node1" clear_params="true">
+    <rosparam command="load" file="$(find autopilot_localization)/params/ukf_template.yaml" />
+
+    <!--  Placeholder for output topic remapping
+    <remap from="odometry/filtered" to=""/>
+    <remap from="accel/filtered" to=""/>
+    -->
+
+  </node>
+</launch>

@@ -1,0 +1,27 @@
+<launch>
+    <arg name="camera_name"    default='zed2i'/>
+    <arg name="svo_file" default=""/>
+    <arg name="base_frame"           default="base_link" />
+
+    
+
+    <group if="$(eval arg('camera_name') =='zed2')">
+     <include file="$(find zed_wrapper)/launch/zed2.launch" >
+        <arg name="svo_file"            value="$(arg svo_file)"/>
+         <arg name="base_frame"          value="$(arg base_frame)" />
+        
+
+      </include>
+    </group>
+
+    <group if="$(eval arg('camera_name') =='zed2i')">
+     <include file="$(find zed_wrapper)/launch/zed2i.launch" >
+        <arg name="svo_file"            value="$(arg svo_file)"/>
+        <arg name="base_frame"          value="$(arg base_frame)" />
+        
+
+      </include>
+    </group>
+
+</launch>
+

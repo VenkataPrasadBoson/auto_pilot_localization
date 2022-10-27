@@ -1,0 +1,15 @@
+<launch>
+  <arg name = "lanuch_camera"             default="true"/>
+  
+<node pkg="rosbag" type="record" name="rosbag_odometry_loc"
+       args="record -O $(env HOME)/.bags/localization /mavros/global_position/local /zed2i/zed_node/odom /odometry/filtered /tf /tf_static" />
+  
+<include file="$(find zed_wrapper)/launch/zed2i.launch"  if = "$(eval arg('lanuch_camera'))"/>
+
+<node pkg="autopilot_localization" name="zed_setpose_node" type="zed_setpose.py" />
+
+<node pkg="robot_localization" type="ukf_localization_node" name="ukf_localization_node1" clear_params="true">
+    <rosparam command="load" file="$(find autopilot_localization)/params/ukf_template.yaml" />
+</node>
+
+</launch>
